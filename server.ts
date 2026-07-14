@@ -1,8 +1,30 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
+import { GoogleGenAI } from "@google/genai";
+
+// Initialize GoogleGenAI Client lazily to prevent crashing on startup when key is missing
+let aiClientInstance: GoogleGenAI | null = null;
+function getGeminiClient(): GoogleGenAI {
+  if (!aiClientInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY environment variable is required but is not configured. Please set it in the Settings/Secrets panel.");
+    }
+    aiClientInstance = new GoogleGenAI({
+      apiKey: apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        }
+      }
+    });
+  }
+  return aiClientInstance;
+}
 
 const app = express();
 const PORT = 3000;
@@ -789,6 +811,39 @@ app.get("/api/verify", (req, res) => {
   }
 
   res.json({ valid: false, error: "Nomor surat atau SPPD tidak terdaftar di sistem Puskesmas Boyan Tanjung" });
+});
+
+
+// GEMINI CHAT ENDPOINT
+app.post("/api/gemini/chat", requireAuth, async (req, res) => {
+  const { messages, model, roleInstruction } = req.body;
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: "Array pesan (messages) wajib dikirimkan." });
+  }
+
+  const modelToUse = model || "gemini-3.5-flash";
+
+  try {
+    const formattedContents = messages.map((m: any) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+
+    const response = await getGeminiClient().models.generateContent({
+      model: modelToUse,
+      contents: formattedContents,
+      config: {
+        systemInstruction: roleInstruction || "You are a helpful administrative assistant for Puskesmas Boyan Tanjung."
+      }
+    });
+
+    res.json({ text: response.text });
+  } catch (error: any) {
+    console.error("Gemini API Error:", error);
+    res.status(500).json({ 
+      error: error.message || "Terjadi kegagalan komunikasi dengan Gemini AI." 
+    });
+  }
 });
 
 

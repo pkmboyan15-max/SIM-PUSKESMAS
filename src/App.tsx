@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { 
   LayoutDashboard, Users, CalendarRange, FileText, FileCheck, 
-  Settings, Code2, ShieldAlert, LogOut, Moon, Sun, Menu, X, Clock, ShieldCheck
+  Settings, Code2, ShieldAlert, LogOut, Moon, Sun, Menu, X, Clock, ShieldCheck,
+  Sparkles
 } from "lucide-react";
 
 // Import custom views
@@ -13,6 +14,7 @@ import SppdView from "./components/SppdView";
 import SettingsView from "./components/SettingsView";
 import AppsScriptView from "./components/AppsScriptView";
 import VerificationView from "./components/VerificationView";
+import GeminiChatView from "./components/GeminiChatView";
 
 // Import Types
 import { UserSession } from "./types";
@@ -185,6 +187,8 @@ export default function App() {
             }}
           />
         );
+      case "gemini-chat":
+        return <GeminiChatView session={session} showToast={showToast} />;
       case "settings":
         return (
           <SettingsView 
@@ -208,6 +212,7 @@ export default function App() {
       case "kegiatan": return "Agenda Kegiatan";
       case "surattugas": return "Administrasi Surat Tugas";
       case "sppd": return "Pertanggungjawaban SPPD";
+      case "gemini-chat": return "Asisten Pintar Gemini AI";
       case "settings": return "Konfigurasi Pengaturan";
       case "apps-script": return "Apps Script Code Center";
       case "verification": return "E-Verification Portal";
@@ -431,6 +436,7 @@ export default function App() {
               { id: "kegiatan", label: "Agenda Kegiatan", icon: CalendarRange },
               { id: "surattugas", label: "Surat Tugas", icon: FileText },
               { id: "sppd", label: "Pertanggungjawaban SPPD", icon: FileCheck },
+              { id: "gemini-chat", label: "Asisten AI Gemini", icon: Sparkles },
               { id: "settings", label: "Pengaturan Profil", icon: Settings },
               { id: "apps-script", label: "Apps Script Code", icon: Code2 },
               { id: "verification", label: "Portal Verifikasi", icon: ShieldCheck }
