@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Administrasi Surat Tugas & SPPD Puskesmas Boyan Tanjung",
+  "description": "Aplikasi pengelolaan administrasi Surat Tugas dan SPPD berbasis Google Sheets dan Web Interface untuk Puskesmas Boyan Tanjung.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
